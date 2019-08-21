@@ -1,0 +1,53 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Oct  9 11:39:36 2018",
+    "version": "eosio::abi/1.0",
+    "structs": [
+        {
+            "name": "entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "full_name",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "hi",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "full_name",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "types": [],
+    "actions": [
+        {
+            "name": "hi",
+            "type": "hi",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "history",
+            "type": "entry",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "abi_extensions": []
+}
