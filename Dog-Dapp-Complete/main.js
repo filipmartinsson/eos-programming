@@ -9,8 +9,8 @@ const network = ScatterJS.Network.fromJson({
 });
 
 const contractConfig = {
-  code: "payable",
-  scope: "payable",
+  code: "dogcontract",
+  scope: "dogcontract",
   dogTableName: "dogs",
   balancesTableName: "balances",
   symbol: "DOGCOIN"
@@ -20,73 +20,96 @@ var eos;
 var rpc;
 var account;
 
-ScatterJS.connect('TestDapp', {network}).then(connected => {
-    if(!connected) return alert("No Scatter Detected");
-    const scatter = ScatterJS.scatter;
-    window.ScatterJS = null;
+ScatterJS.connect('DogDapp', {network}).then(connected => {
+  if(!connected) return alert("No Scatter Detected");
+  console.log("Scatter Connected");
 
-    scatter.login({accounts: [network]}).then(function(a){
-      account = scatter.account('eos')
-      $("#username").text(account.name);
-      const eosOptions = { expireInSeconds:60 };
+  const scatter = ScatterJS.scatter;
+  window.ScatterJS = null;
 
-      rpc = new eosjs_jsonrpc.JsonRpc(network.fullhost());
-      //const api = new eosjs_api.Api({ rpc, signatureProvider });
-
-      eos = scatter.eos(network, eosjs_api.Api, {rpc});
-
-      getDogs();
-      getBalance();
-    });
+  scatter.login({accounts: [network]}).then(function(){
+    account = scatter.account('eos');
+    rpc = new eosjs_jsonrpc.JsonRpc(network.fullhost());
+    eos = scatter.eos(network, eosjs_api.Api, {rpc});
+    getDogs();
+    getBalances();
+  });
 
 });
 
 function getDogs(){
   rpc.get_table_rows({
-    json:true,
-    scope: contractConfig.scope,
+    json: true,
     code: contractConfig.code,
+    scope: contractConfig.scope,
     table: contractConfig.dogTableName,
     index_position: 2,
     key_type: "name",
     lower_bound: account.name,
     upper_bound: account.name
-  }).then(res => {
-      console.log(res);
-     populateDogList(res.rows);
-    });
+  }).then(function(res){
+    console.log(res);
+    populateDogList(res.rows);
+  })
+}
+function getBalances(){
+  rpc.get_table_rows({
+    json: true,
+    code: contractConfig.code,
+    scope: account.name,
+    table: contractConfig.balancesTableName,
+  }).then(function(res){
+    console.log(res);
+    populateBalanceList(res.rows);
+  })
 }
 
 function populateDogList(dogs){
-  $('#doglist').empty();
+  $("#doglist").empty();
+  var ul = document.getElementById("doglist");
   for (var i = 0; i < dogs.length; i++) {
-    var ul = document.getElementById("doglist");
     var li = document.createElement("li");
     li.appendChild(document.createTextNode(dogs[i].id + ": " + dogs[i].dog_name + ", " + dogs[i].age));
     ul.appendChild(li);
   }
 }
-function populateCurrencyList(balances){
-  $('#currencylist').empty();
+function populateBalanceList(balances){
+  $("#balance_list").empty();
+  var ul = document.getElementById("balance_list");
   for (var i = 0; i < balances.length; i++) {
-    var ul = document.getElementById("currencylist");
     var li = document.createElement("li");
     li.appendChild(document.createTextNode(balances[i].funds));
     ul.appendChild(li);
   }
 }
+function addDog(){
+  var dogName = $("#dog_name").val();
+  var dogAge = $("#dog_age").val();
 
-function getBalance(){
-  rpc.get_table_rows({
-    json:true,
-    scope: account.name,
-    code: contractConfig.code,
-    table: contractConfig.balancesTableName,
-  }).then(res => {
-     populateCurrencyList(res.rows)
-    });
+  eos.transact({
+    actions: [{
+      account: contractConfig.code,
+      name: 'insert',
+      authorization: [{
+        actor: account.name,
+        permission: account.authority
+      }],
+      data: {
+        owner: account.name,
+        dog_name: dogName,
+        age: dogAge
+      }
+    }]
+  }, {
+    blocksBehind: 3,
+    expireSeconds: 30
+  }).then(function(res){
+    getDogs();
+    getBalances();
+  }).catch(function(err){
+    alert(err);
+  })
 }
-
 function deposit(){
   var quantity = $("#depositvalue").val();
   var asset = quantity + " " + contractConfig.symbol;
@@ -110,14 +133,13 @@ function deposit(){
         blocksBehind: 3,
         expireSeconds: 30,
     }).then(function(res){
-        getBalance();
+        getBalances();
     }).catch(function(err){
         alert('error: ', err);
     });
 }
-
 function removeDog(){
-  var dogId = parseInt($("#dog_id").val());
+  var dogId = $("#dog_id").val();
   eos.transact({
         actions: [{
             account: contractConfig.code,
@@ -139,7 +161,7 @@ function removeDog(){
         alert('error: ', err);
     });
 }
-function removeAll(){
+function removeAllMyDogs(){
   eos.transact({
         actions: [{
             account: contractConfig.code,
@@ -161,38 +183,10 @@ function removeAll(){
         alert('error: ', err);
     });
 }
-
-function addDog(){
-  var dogName = $("#dog_name").val();
-  var dogAge = $("#dog_age").val();
-
-  eos.transact({
-        actions: [{
-            account: contractConfig.code,
-            name: 'insert',
-            authorization: [{
-                actor: account.name,
-                permission: account.authority,
-            }],
-            data: {
-                owner: account.name,
-                dog_name: dogName,
-                age: dogAge
-            },
-        }]
-    }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-    }).then(function(res){
-        getDogs();
-        getBalance();
-    }).catch(function(err){
-        alert('error: ', err);
-    });
-}
 $(document).ready(function() {
-  $("#depositButton").click(deposit);
-  $("#adddog").click(addDog);
+  $("#add_dog_button").click(addDog);
   $("#removeButton").click(removeDog);
-  $("#removeAllButton").click(removeAll);
+  $("#removeAllMyDogsButton").click(removeAllMyDogs);
+  $("#depositButton").click(deposit);
+
 });

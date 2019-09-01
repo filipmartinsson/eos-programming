@@ -4,9 +4,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-    <script src="https://cdn.scattercdn.com/file/scatter-cdn/js/latest/scatterjs-core.min.js"></script>
-    <script src="https://cdn.scattercdn.com/file/scatter-cdn/js/latest/scatterjs-plugin-eosjs2.min.js"></script>
-
+    <script src="dist-web/scatterjs-core.min.js"></script>
+    <script src="dist-web/scatterjs-plugin-eosjs2.min.js"></script>
     <script src='dist-web/eosjs-api.js'></script>
     <script src='dist-web/eosjs-jsonrpc.js'></script>
     <script src='dist-web/eosjs-jssig.js'></script>
@@ -21,7 +20,6 @@
       <div class="container">
         <h1 class="display-4">Dog Dapp</h1>
         <p class="lead">We store your dogs in a safe and decentralized way.</p>
-        <p id="username"></p>
       </div>
     </div>
 
@@ -33,9 +31,9 @@
           </ul>
         </div>
         <div class="col">
-          <h2>Your Balance</h2>
-          <ul id="currencylist">
-          </ul>
+          <h2>Remove Dog</h2>
+          <input type="number" id="dog_id">
+          <button type="button" class="btn btn-secondary" id="removeButton">Remove</button>
         </div>
       </div>
 
@@ -43,39 +41,30 @@
         <div class="col">
           <h2>Add Dog</h2>
           <div>
-          <label>Dog name</label>
-          <input type="text" id="dog_name" value="">
+              <label>Dog name</label>
+              <input type="text" id="dog_name">
           </div>
-
           <div>
-          <label>Dog Age</label>
-          <input type="number" id="dog_age" value="">
+              <label>Dog age</label>
+              <input type="number" id="dog_age">
           </div>
-
-          <div>
-          <button class="btn btn-primary" id="adddog">Add dog</button>
-          </div>
+          <button type="button" id="add_dog_button" class="btn btn-primary">Add</button>
         </div>
         <div class="col">
-          <h2>Deposit</h2>
-          <input type="number" id="depositvalue" value="100">
-          <button type="button" class="btn btn-secondary" id="depositButton">Deposit</button>
+          <h2>Remove All Your Dogs</h2>
+          <button type="button" id="removeAllMyDogsButton" class="btn btn-danger">Remove All</button>
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <h2>Remove Dog</h2>
-          <input type="number" id="dog_id">
-          <button type="button" class="btn btn-secondary" id="removeButton">Remove</button>
+          <h2>Balances</h2>
+          <ul id="balance_list">
+          </ul>
+          <label>Amount</label>
+          <input type="number" id="depositvalue" value="100">
+          <button type="button" class="btn btn-secondary" id="depositButton">Deposit</button>
         </div>
-        <div class="col">
-          <h2>Remove All My Dogs</h2>
-          <button type="button" class="btn btn-danger" id="removeAllButton">Nuke 'em</button>
-        </div>
-
       </div>
-
-
     </div>
   </body>
 </html>
